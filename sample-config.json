@@ -1,0 +1,35 @@
+{
+    "development": {
+        "port": 4004,
+        "mongodb": {
+            "db": "",
+            "user": "",
+            "pass": "",
+            "host": "",
+            "port": "",
+            "auth_source": ""
+        }
+    },
+    "staging": {
+        "port": 4004,
+        "mongodb": {
+            "db": "",
+            "user": "",
+            "pass": "",
+            "host": "",
+            "port": "",
+            "auth_source": ""
+        }
+    },
+    "production": {
+        "port": 4004,
+        "mongodb": {
+            "db": "",
+            "user": "",
+            "pass": "",
+            "host": "",
+            "port": "",
+            "auth_source": ""
+        }
+    }
+}
