@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const uuidApiKey = require("uuid-apikey");
 const mongooseBcrypt = require("mongoose-bcrypt");
 const mongooseTimeStamp = require("mongoose-timestamp");
+const validator = require("validator");
 
 const orgSchema = new mongoose.Schema(
   { 
@@ -16,7 +17,7 @@ const orgSchema = new mongoose.Schema(
       maxlength: 100,
       required: true,
     },
-    orgDomain: {
+    website: {
       type: String,
       required: true,
       trim: true,
@@ -28,6 +29,13 @@ const orgSchema = new mongoose.Schema(
         maxlength: 100,
     },
     address: {
+      type: String,
+      required: true,
+      minlength: 10,
+      maxlength: 150,
+      trim: true,
+    },
+    adminName : {
       type: String,
       required: true,
       minlength: 10,
@@ -49,6 +57,7 @@ const orgSchema = new mongoose.Schema(
         required: true,
         bcrypt: true,
         minlength: 8,
+        maxlength: 32
     },
     api_key: {
         type: String,

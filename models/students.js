@@ -43,7 +43,7 @@ const studentSchema = new mongoose.Schema(
       required: true,
       unique: true,
       minlength: 13,
-      maxlength
+      maxlength:13
     },
     password: {
       type: String,
