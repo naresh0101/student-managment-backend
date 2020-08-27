@@ -1,5 +1,6 @@
 const Models = require("../models"),
   OrgService = require('../services/org'),
+  studentsService = require('../services/students'),
   Joi = require("@hapi/joi");
 
 class OrganizationController {
@@ -33,7 +34,72 @@ class OrganizationController {
         resBody.success = true;
         resBody.message = "Orgnization added Successfully";
         res.status(200).json(resBody);
+    }
 
+    async loginAccount(req, res) {
+        let reqBody = req.body,
+          resBody = { success: false };
+        let inputSchema = Joi.object({
+          email: Joi.string().email().required(),
+          password: Joi.string().min(8).max(32).required(),
+        });
+        try {
+          await inputSchema.validateAsync(reqBody);
+        } catch (err) {
+          resBody.message = err.message.replace(/\"/g, "");
+          return res.status(200).json(resBody);
+        }
+        let org = await Models.Organizations.findOne({ email: reqBody.email });
+        if (!org) {
+          resBody.message = "Invalid email provided";
+          return res.status(200).json(resBody);
+        }
+        const isValidPassword = await org.verifyPassword(reqBody.password);
+        if (!isValidPassword) {
+          resBody.message = "Invalid password provided";
+          return res.status(200).json(resBody);
+        }
+        resBody = {
+          success : true,
+          org: org.toJSON(),
+          token: org.api_key,
+          message : "Login successfully"
+        };
+        res.status(200).json(resBody);
+    }
+
+    async addstudents(req, res) {
+      let reqBody = req.body,
+      resBody = { success: false };   
+      // Input body validation
+      let inputSchema = Joi.object({
+          profile: Joi.string().min(3).max(100),
+          name: Joi.string().min(3).max(100).required(),
+          orgArray: Joi.object(
+            {
+              orgId: Joi.string().required(),
+              roles : Joi.number().required(),
+              active : Joi.boolean().required()
+            }
+          ).required(),
+          phone: Joi.string().min(13).max(13).required(),
+          password: Joi.string().min(8).max(32).required(),
+        });
+      try {
+          await inputSchema.validateAsync(reqBody);
+      } catch (err) {
+          resBody.message = err.message.replace(/\"/g, "");
+          return res.status(200).json(resBody);
+      }
+      let org = await studentsService.Isuniqe(reqBody)
+      if (org[0]) {
+          resBody.message = "Student with this number already exist!";
+          return res.status(200).json(resBody);
+      }
+      org = await studentsService.AddStudent(reqBody);
+      resBody.success = true;
+      resBody.message = "Student added Successfully";
+      res.status(200).json(resBody);
     }
 
 }

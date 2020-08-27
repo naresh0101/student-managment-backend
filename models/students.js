@@ -35,6 +35,8 @@ const studentSchema = new mongoose.Schema(
     profile: {
       type: String,
       trim: true,
+      minlength:3,
+      maxlength:100
     },
     phone: {
       type: String,
@@ -58,9 +60,8 @@ const studentSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      required: true,
       enum: [STATUS_ACTIVE, STATUS_PENDING, STATUS_DISABLED, STATUS_DELETED],
-      default: STATUS_PENDING,
+      default: STATUS_ACTIVE,
     },
   },
   { collection: "students" }
