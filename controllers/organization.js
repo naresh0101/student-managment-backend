@@ -100,9 +100,12 @@ class OrganizationController {
             {$match : {"orgArray.orgId" : orgid}},
             {$group : {_id : {phone : "$phone" } }},
           ])
-          if(isPartOfOrg[0]._id.phone === reqBody.phone){
-            resBody.message = "This Student is already part of our Org!";
-            return res.status(200).json(resBody);
+          
+          if(isPartOfOrg.length !=0){
+            if(isPartOfOrg[0]._id.phone === reqBody.phone){
+              resBody.message = "This Student is already part of our Org!";
+              return res.status(200).json(resBody);
+            }
           }
           let student = await studentsService.ValidUser(reqBody.phone)
           if (student[0]) {
@@ -114,6 +117,7 @@ class OrganizationController {
           resBody.message = "Student added Successfully";
           res.status(200).json(resBody);
       } catch (err) {
+        console.log(err);
           resBody.message = err.message.replace(/\"/g, "");
           return res.status(200).json(resBody);
       }
