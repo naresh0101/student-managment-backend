@@ -4,11 +4,12 @@ const Models = require("../models"),
 const students = require("../models/students");
 
 class StudentController {
+
     async loginAccount(req, res) {
         let reqBody = req.body,
           resBody = { success: false };
         let inputSchema = Joi.object({
-          phone: Joi.string().min(13).max(13).required(),
+          phone: Joi.string().min(10).max(16).required(),
           password: Joi.string().min(8).max(32).required(),
         });
         try {
@@ -36,6 +37,7 @@ class StudentController {
         res.status(200).json(resBody);
     }
 
+    
 }
 
 module.exports = new StudentController()

@@ -7,11 +7,11 @@ class OrganizationController {
   
     async addOrg(req, res) {
         let reqBody = req.body,
-        resBody = { success: false };   
+        resBody = { success: false };  
         // Input body validation
         let inputSchema = Joi.object({
             orgLogo: Joi.string().min(3).max(100),
-            describe: Joi.string().min(3).max(100),
+            describe: Joi.string().min(3).max(200),
             email: Joi.string().email().required(),
             orgName: Joi.string().min(5).max(100).required(),
             website: Joi.string().min(5).max(100).required(),
@@ -26,7 +26,7 @@ class OrganizationController {
             return res.status(200).json(resBody);
         }
         let org = await OrgService.Isuniqe(reqBody)
-        if (org) {
+        if (org.length != 0) {
             resBody.message = "Orgnization with this email address already exist!";
             return res.status(200).json(resBody);
         }
@@ -70,11 +70,13 @@ class OrganizationController {
 
     async addstudents(req, res) {
       let reqBody = req.body,
-      resBody = { success: false };   
+      resBody = { success: false };
+    
       // Input body validation
       let inputSchema = Joi.object({
           profile: Joi.string().min(3).max(100),
           name: Joi.string().min(3).max(100).required(),
+          describe: Joi.string().min(3).max(100).required(),
           orgArray: Joi.object(
             {
               orgId: Joi.string().required(),
@@ -82,7 +84,7 @@ class OrganizationController {
               active : Joi.boolean().required()
             }
           ).required(),
-          phone: Joi.string().min(13).max(13).required(),
+          phone: Joi.string().min(10).max(16).required(),
           password: Joi.string().min(8).max(32).required(),
         });
       try {
@@ -91,17 +93,58 @@ class OrganizationController {
           resBody.message = err.message.replace(/\"/g, "");
           return res.status(200).json(resBody);
       }
-      let org = await studentsService.Isuniqe(reqBody)
-      if (org[0]) {
-          resBody.message = "Student with this number already exist!";
+      try {
+        const orgid = res.user[0]._id._id.toString()
+        const isPartOfOrg = await Models.Students.aggregate(
+          [
+            {$match : {"orgArray.orgId" : orgid}},
+            {$group : {_id : {phone : "$phone" } }},
+          ])
+          if(isPartOfOrg[0]._id.phone === reqBody.phone){
+            resBody.message = "This Student is already part of our Org!";
+            return res.status(200).json(resBody);
+          }
+          let student = await studentsService.ValidUser(reqBody.phone)
+          if (student[0]) {
+              resBody.message = "Student with this number already exist!";
+              return res.status(200).json(resBody);
+          }
+          await studentsService.AddStudent(reqBody);
+          resBody.success = true;
+          resBody.message = "Student added Successfully";
+          res.status(200).json(resBody);
+      } catch (err) {
+          resBody.message = err.message.replace(/\"/g, "");
           return res.status(200).json(resBody);
       }
-      org = await studentsService.AddStudent(reqBody);
-      resBody.success = true;
-      resBody.message = "Student added Successfully";
-      res.status(200).json(resBody);
     }
 
+    async fetchstudent(req, res, next) {
+      let resBody = { success: false },
+      reqBody = req.body  
+      switch (res.user[0]._id.usertype) {
+        case 'Admin':
+            try {
+              const students = await Models.Students.aggregate(
+                [
+                  {$match : { "orgArray.roles" : 2 }},
+                  {$group : {_id : {phone : "$phone", name : "$name", profile : "$profile", status:"$status" } }},
+                ]
+              )
+              resBody.success = true;
+              resBody.data = students;
+              res.status(200).json(students);
+            } catch (err) {
+              resBody.message = err.message.replace(/\"/g, "");
+              return res.status(200).json(resBody);
+            }
+          break;
+        default:
+          resBody.success = false;
+          resBody.message = "Students not found";
+          res.status(200).json(resBody);
+      }
+    }
 }
 
 module.exports = new OrganizationController()

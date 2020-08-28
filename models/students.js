@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const mongooseBcrypt = require("mongoose-bcrypt");
 const mongooseTimeStamp = require("mongoose-timestamp");
 const uuidApiKey = require("uuid-apikey");
+const { string } = require("@hapi/joi");
 
 const STATUS_ACTIVE = "active",
   STATUS_PENDING = "pending",
@@ -16,6 +17,11 @@ const studentSchema = new mongoose.Schema(
       minlength: 3,
       maxlength: 100,
       required: true,
+    },
+    usertype:{
+      type:String,
+      default: "Student",
+      enum: ["Student"]
     },
     orgArray : [
             {
@@ -44,8 +50,15 @@ const studentSchema = new mongoose.Schema(
       trim: true,
       required: true,
       unique: true,
-      minlength: 13,
-      maxlength:13
+      minlength: 10,
+      maxlength:16
+    },
+    describe: {
+      type: String,
+      trim: true,
+      minlength: 5,
+      required:true,
+      maxlength: 100,
     },
     password: {
       type: String,

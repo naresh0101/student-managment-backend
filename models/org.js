@@ -3,12 +3,18 @@ const uuidApiKey = require("uuid-apikey");
 const mongooseBcrypt = require("mongoose-bcrypt");
 const mongooseTimeStamp = require("mongoose-timestamp");
 const validator = require("validator");
+const { string } = require("@hapi/joi");
 
 const orgSchema = new mongoose.Schema(
   { 
     orgLogo : {
       type: String,
       trim: true,
+    },
+    usertype: {
+      type:String,
+      default:"Admin",
+      enum:["Admin"]
     },
     orgName: {
       type: String,
@@ -26,7 +32,7 @@ const orgSchema = new mongoose.Schema(
         type: String,
         trim: true,
         minlength: 5,
-        maxlength: 100,
+        maxlength:200,
     },
     address: {
       type: String,
