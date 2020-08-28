@@ -128,7 +128,7 @@ class OrganizationController {
               const students = await Models.Students.aggregate(
                 [
                   {$match : { "orgArray.roles" : 2 }},
-                  {$group : {_id : {phone : "$phone", name : "$name", profile : "$profile", status:"$status" } }},
+                  {$group : {_id : {phone : "$phone", name : "$name", profile : "$profile", status:"$status",describe: "$describe" } }},
                 ]
               )
               resBody.success = true;
