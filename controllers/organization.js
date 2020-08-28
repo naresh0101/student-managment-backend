@@ -55,6 +55,7 @@ class OrganizationController {
           return res.status(200).json(resBody);
         }
         const isValidPassword = await org.verifyPassword(reqBody.password);
+        console.log(isValidPassword);
         if (!isValidPassword) {
           resBody.message = "Invalid password provided";
           return res.status(200).json(resBody);
@@ -71,7 +72,6 @@ class OrganizationController {
     async addstudents(req, res) {
       let reqBody = req.body,
       resBody = { success: false };
-    
       // Input body validation
       let inputSchema = Joi.object({
           profile: Joi.string().min(3).max(100),
@@ -97,19 +97,18 @@ class OrganizationController {
         const orgid = res.user[0]._id._id.toString()
         const isPartOfOrg = await Models.Students.aggregate(
           [
-            {$match : {"orgArray.orgId" : orgid}},
+            {$match : {"orgArray.orgId" : orgid, "phone": reqBody.phone}},
             {$group : {_id : {phone : "$phone" } }},
           ])
-          
-          if(isPartOfOrg.length !=0){
+          console.log(isPartOfOrg);
+          if(isPartOfOrg.length !=0 ){
             if(isPartOfOrg[0]._id.phone === reqBody.phone){
-              resBody.message = "This Student is already part of our Org!";
+              resBody.message = "Student with this number already exist!";
               return res.status(200).json(resBody);
             }
           }
           let student = await studentsService.ValidUser(reqBody.phone)
           if (student[0]) {
-              resBody.message = "Student with this number already exist!";
               return res.status(200).json(resBody);
           }
           await studentsService.AddStudent(reqBody);

@@ -37,7 +37,6 @@ class StudentController {
         res.status(200).json(resBody);
     }
 
-    
 }
 
 module.exports = new StudentController()

@@ -1,7 +1,6 @@
 let mongoose = require("mongoose");
 let util = require("util");
 const config = (require('../config.json')[process.env.NODE_ENV]).mongodb
-
 class Mongodb {
   constructor() {
     this.uri = util.format('mongodb://%s:%s@%s:%s/%s?authSource=%s',
