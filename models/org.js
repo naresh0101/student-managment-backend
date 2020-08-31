@@ -44,7 +44,7 @@ const orgSchema = new mongoose.Schema(
     adminName : {
       type: String,
       required: true,
-      minlength: 10,
+      minlength: 3,
       maxlength: 100,
       trim: true,
     },
