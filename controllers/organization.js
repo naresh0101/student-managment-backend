@@ -100,15 +100,15 @@ class OrganizationController {
             {$match : {"orgArray.orgId" : orgid, "phone": reqBody.phone}},
             {$group : {_id : {phone : "$phone" } }},
           ])
-          console.log(isPartOfOrg);
-          if(isPartOfOrg.length !=0 ){
+          if(isPartOfOrg.length != 0 ){
             if(isPartOfOrg[0]._id.phone === reqBody.phone){
-              resBody.message = "Student with this number already exist!";
+              resBody.message = "Student is already part of your Org!";
               return res.status(200).json(resBody);
             }
           }
           let student = await studentsService.ValidUser(reqBody.phone)
           if (student[0]) {
+              resBody.message = "Student with this number already exist!";
               return res.status(200).json(resBody);
           }
           await studentsService.AddStudent(reqBody);
